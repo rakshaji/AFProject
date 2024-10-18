@@ -34,9 +34,9 @@
         sharedCounter: 0,
         
         defaultOptions: {
-            width: 256,
-            height: 144,
-            scale: .25,
+            width: 200,//256
+            height: 150,
+            scale: .65,//.25
             prefetch: 'pageload'
         },
                 
@@ -116,3 +116,9 @@
         }
     };
 })(jQuery);
+
+$(function() {
+      //$('#tinyurl a').miniPreview({ prefetch: 'pageload' });
+      $('#tinyurl a').miniPreview({ prefetch: 'parenthover' });
+      //$('#p3 a').miniPreview({ prefetch: 'none' });
+});

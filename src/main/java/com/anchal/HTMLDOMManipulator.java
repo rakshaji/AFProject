@@ -25,11 +25,21 @@ import org.w3c.dom.NodeList;
 public class HTMLDOMManipulator {
 
 	private static int LINK_COUNT = 0;
+	private static String INPUT_FILE_DIR = ".\\input";
 
 	public static void main(String[] args) {
 		try {
+			File inputFile = null;
 			// Load the HTML file
-			File inputFile = new File(".\\input\\Purchase Register - Input.html");
+			File inputFileDir = new File(INPUT_FILE_DIR);
+			for(String file : inputFileDir.list()) {
+				if(file.endsWith("html")) {
+					inputFile = new File(INPUT_FILE_DIR + "\\" + file);
+					System.out.println("Input file - " + inputFile.getAbsolutePath());
+					break;
+				}
+			}
+			
 			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
 			Document doc = dBuilder.parse(inputFile);
