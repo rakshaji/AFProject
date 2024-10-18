@@ -1,0 +1,16 @@
+Oct 18, 2024 9:05:18 AM com.anchal.ExcelURLProcessor main
+INFO: Hello world!.............
+Oct 18, 2024 9:05:18 AM com.anchal.ExcelURLProcessor main
+INFO: tinyUrl - Http://Tinyurl.Com/Yrdquvjv
+Oct 18, 2024 9:05:21 AM com.anchal.ExcelURLProcessor main
+INFO: expandedUrl - https://photos.google.com/share/AF1QipO5Kexgu8gXPG1XWPq1bYByIHeKjkwaDqU8mMuUzikWMvvbAbAZYfrk3BU47AOUBg/photo/AF1QipPm6beUnw8Ib0HxmubdLq0tT32qZpABptoVgf8a?key=R1FBMHB2U0NUTGdDVi1kY0xSd3hkUWJmcDg2cDNB
+Oct 18, 2024 9:05:21 AM com.anchal.ExcelURLProcessor getLh3Link
+INFO: expandedUrl inside getLh3Link - https://photos.google.com/share/AF1QipO5Kexgu8gXPG1XWPq1bYByIHeKjkwaDqU8mMuUzikWMvvbAbAZYfrk3BU47AOUBg/photo/AF1QipPm6beUnw8Ib0HxmubdLq0tT32qZpABptoVgf8a?key=R1FBMHB2U0NUTGdDVi1kY0xSd3hkUWJmcDg2cDNB
+Oct 18, 2024 9:05:22 AM com.anchal.ExcelURLProcessor getLh3Link
+INFO: imgTags - <img aria-hidden="true" jsname="VAJbob" class="Mt0Lzd" src="https://lh3.googleusercontent.com/pw/AP1GczO3rSLo-x3Q_7pCldnS0flHiWpvjndJL7N63KEMlAgLRsDgX0VP81rbssQL29REOcsR-ZSVFp24PddpCCJ0GROo6XO2TBdgPwSAqeJd41Ov_D-pTuuP=s250-k-rw-no">
+<img jsname="uLHQEd" class="BiCYpc LoqKDd Tp7tdd" style="max-width: 4000px; max-height: 3000px;" src="https://lh3.googleusercontent.com/pw/AP1GczO3rSLo-x3Q_7pCldnS0flHiWpvjndJL7N63KEMlAgLRsDgX0VP81rbssQL29REOcsR-ZSVFp24PddpCCJ0GROo6XO2TBdgPwSAqeJd41Ov_D-pTuuP=s250-k-rw-no" aria-label="Photo - Landscape - Jan 11, 2024, 3:28:55 PM">
+<img src="data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==" jsname="C9U8yd" class="lL7eNc">
+Oct 18, 2024 9:05:22 AM com.anchal.ExcelURLProcessor getLh3Link
+INFO: Direct Image URL: https://lh3.googleusercontent.com/pw/AP1GczO3rSLo-x3Q_7pCldnS0flHiWpvjndJL7N63KEMlAgLRsDgX0VP81rbssQL29REOcsR-ZSVFp24PddpCCJ0GROo6XO2TBdgPwSAqeJd41Ov_D-pTuuP=s250-k-rw-no
+Oct 18, 2024 9:05:22 AM com.anchal.ExcelURLProcessor main
+INFO: lh3Url - https://lh3.googleusercontent.com/pw/AP1GczO3rSLo-x3Q_7pCldnS0flHiWpvjndJL7N63KEMlAgLRsDgX0VP81rbssQL29REOcsR-ZSVFp24PddpCCJ0GROo6XO2TBdgPwSAqeJd41Ov_D-pTuuP=s250-k-rw-no

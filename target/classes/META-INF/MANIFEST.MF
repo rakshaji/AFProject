@@ -1,0 +1,15 @@
+Manifest-Version: 1.0
+Built-By: Laksha
+Build-Jdk: 17.0.4.1
+Class-Path: dependency-jars/poi-ooxml-5.2.3.jar dependency-jars/poi-ooxm
+ l-lite-5.2.3.jar dependency-jars/xmlbeans-5.1.1.jar dependency-jars/com
+ mons-compress-1.21.jar dependency-jars/commons-io-2.11.0.jar dependency
+ -jars/curvesapi-1.07.jar dependency-jars/log4j-api-2.18.0.jar dependenc
+ y-jars/commons-collections4-4.4.jar dependency-jars/poi-5.2.3.jar depen
+ dency-jars/commons-codec-1.15.jar dependency-jars/commons-math3-3.6.1.j
+ ar dependency-jars/SparseBitSet-1.2.jar dependency-jars/jsoup-1.15.4.ja
+ r dependency-jars/thumbnailator-0.4.14.jar dependency-jars/log4j-1.2.17
+ .jar
+Main-Class: com.anchal.ExcelURLProcessor
+Created-By: Maven Integration for Eclipse
+
