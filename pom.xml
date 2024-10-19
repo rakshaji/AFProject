@@ -3,19 +3,17 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
     <groupId>com.anchal</groupId>
-    <artifactId>excel-url-processor</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <artifactId>TEST-PHC</artifactId>
+    <version>1.0</version>
 
     <properties>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
     </properties>
 
     <build>
         <plugins>
-            
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
@@ -24,7 +22,7 @@
                 <archive>
                     <manifest>
                         <addClasspath>true</addClasspath>
-                        <mainClass>com.anchal.ExcelURLProcessor</mainClass>
+                        <mainClass>com.anchal.PowerHTMLConverter</mainClass>
                         <classpathPrefix>dependency-jars/</classpathPrefix>
                     </manifest>
                 </archive>
@@ -37,7 +35,7 @@
                     <archive>
                     <manifest>
                         <addClasspath>true</addClasspath>
-                        <mainClass>com.anchal.ExcelURLProcessor</mainClass>
+                        <mainClass>com.anchal.PowerHTMLConverter</mainClass>
                         <classpathPrefix>dependency-jars/</classpathPrefix>
                     </manifest>
                     </archive>
@@ -47,11 +45,23 @@
                 </configuration>
                 <executions>
                     <execution>
-                    <id>make-assembly</id> <!-- this is used for inheritance merges -->
-                    <phase>package</phase> <!-- bind to the packaging phase -->
-                    <goals>
-                        <goal>single</goal>
-                    </goals>
+	                    <id>make-assembly</id> <!-- this is used for inheritance merges -->
+	                    <phase>package</phase> <!-- bind to the packaging phase -->
+	                    <goals>
+	                        <goal>single</goal>
+	                    </goals>
+                    </execution>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <appendAssemblyId>false</appendAssemblyId>
+                            <descriptors>
+                                <descriptor>src/main/assembly/zip.xml</descriptor>
+                            </descriptors>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
@@ -95,7 +105,7 @@
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>3.0.0</version>
                 <configuration>
-                    <mainClass>com.anchal.ExcelURLProcessor</mainClass>
+                    <mainClass>com.anchal.PowerHTMLConverter</mainClass>
                 </configuration>
             </plugin>
 
@@ -103,6 +113,11 @@
     </build>
 
     <dependencies>
+	    <dependency>
+		    <groupId>org.apache.commons</groupId>
+		    <artifactId>commons-lang3</artifactId>
+		    <version>3.0</version>
+		</dependency>
     
         <!-- Apache POI for reading and writing Excel files -->
         <dependency>
@@ -136,6 +151,18 @@
             <artifactId>log4j</artifactId>  
             <version>1.2.17</version>  
         </dependency>  
+        
+        <dependency>
+		    <groupId>org.xhtmlrenderer</groupId>
+		    <artifactId>flying-saucer-core</artifactId>
+		    <version>9.1.22</version>
+		</dependency>
+		
+		<dependency>
+		    <groupId>org.xhtmlrenderer</groupId>
+		    <artifactId>flying-saucer-pdf</artifactId>
+		    <version>9.1.22</version>
+		</dependency>
 
     </dependencies>
           

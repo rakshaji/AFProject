@@ -1,15 +1,19 @@
 Manifest-Version: 1.0
 Built-By: Laksha
 Build-Jdk: 17.0.4.1
-Class-Path: dependency-jars/poi-ooxml-5.2.3.jar dependency-jars/poi-ooxm
- l-lite-5.2.3.jar dependency-jars/xmlbeans-5.1.1.jar dependency-jars/com
- mons-compress-1.21.jar dependency-jars/commons-io-2.11.0.jar dependency
- -jars/curvesapi-1.07.jar dependency-jars/log4j-api-2.18.0.jar dependenc
- y-jars/commons-collections4-4.4.jar dependency-jars/poi-5.2.3.jar depen
- dency-jars/commons-codec-1.15.jar dependency-jars/commons-math3-3.6.1.j
- ar dependency-jars/SparseBitSet-1.2.jar dependency-jars/jsoup-1.15.4.ja
- r dependency-jars/thumbnailator-0.4.14.jar dependency-jars/log4j-1.2.17
- .jar
-Main-Class: com.anchal.ExcelURLProcessor
+Class-Path: dependency-jars/commons-lang3-3.0.jar dependency-jars/poi-oo
+ xml-5.2.3.jar dependency-jars/poi-ooxml-lite-5.2.3.jar dependency-jars/
+ xmlbeans-5.1.1.jar dependency-jars/commons-compress-1.21.jar dependency
+ -jars/commons-io-2.11.0.jar dependency-jars/curvesapi-1.07.jar dependen
+ cy-jars/log4j-api-2.18.0.jar dependency-jars/commons-collections4-4.4.j
+ ar dependency-jars/poi-5.2.3.jar dependency-jars/commons-codec-1.15.jar
+  dependency-jars/commons-math3-3.6.1.jar dependency-jars/SparseBitSet-1
+ .2.jar dependency-jars/jsoup-1.15.4.jar dependency-jars/thumbnailator-0
+ .4.14.jar dependency-jars/log4j-1.2.17.jar dependency-jars/flying-sauce
+ r-core-9.1.22.jar dependency-jars/flying-saucer-pdf-9.1.22.jar dependen
+ cy-jars/itext-2.1.7.jar dependency-jars/bcmail-jdk14-1.64.jar dependenc
+ y-jars/bcpkix-jdk14-1.64.jar dependency-jars/bctsp-jdk14-1.46.jar depen
+ dency-jars/bcprov-jdk14-1.64.jar
+Main-Class: com.anchal.PowerHTMLConverter
 Created-By: Maven Integration for Eclipse
 
