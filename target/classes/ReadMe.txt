@@ -1,6 +1,14 @@
-Steps to follow:
+# Release notes:
+-
 
-1) Unzip the zip file by 'Extract here'
+# Prerequisite:
+Your Windows should have Java8 installed and environment variables configured.
+In the system environment variables:
+- set PATH till jdk bin with a '.;' as the very first thing in path
+
+# Steps to follow:
+
+1) Unzip the zip file by 'Extract here' and rename the folder to 'PowerHtmlConverter'
 
 2) Make two folders with following names outside the above folder: 'input' and 'output' 
 - HTML file to convert goes into 'input' folder
@@ -9,4 +17,4 @@ Steps to follow:
 3) Open command prompt to the jar directory
 
 4) Type below command and hit enter:
-java -jar <jar name>.jar
+java -jar TEST-PHC-1.0-jar-with-dependencies.jar

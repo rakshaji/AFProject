@@ -7,9 +7,11 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Properties;
 import java.util.Scanner;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -36,7 +38,7 @@ import com.lowagie.text.DocumentException;
 
 public class PowerHTMLConverter {
 
-	private static boolean IS_SUPPLIER_FLAG = false;
+	private static boolean IS_THUMBNAIL_FORMAT_REQ_FLAG = false;
 	private static boolean IS_PDF_OUTPUT_REQUIRED = false;
 	private static int EXPANDED_LINK_COUNTER = 0;
 	private static int LINK_TO_EXPAND_LIMIT = 0;
@@ -61,66 +63,97 @@ public class PowerHTMLConverter {
 	private static final String URL_IDENTIFIER = "http";
 	private static final String DATE_TIME_FORMAT = "yyyy-MM-dd_HH-mm-ss";
 	private static final String DOT_PDF_FILE_SUFFIX = ".pdf";
-	private static final String JAR_DIR = "./../PowerHtmlConverter/";
+	private static String JAR_DIR = "./../PowerHtmlConverter/";
+	
 
 	public static void main(String[] args) {
+		//InputStream is = PowerHTMLConverter.class.getResourceAsStream("/config.properties" );
+		//Properties properties = new Properties();
 
+		try {
+			//properties.load(is);
+			//JAR_DIR = properties.getProperty("jar_path", JAR_DIR);
+			
+			File inputFile = correctHTMLSyntaxErrors();
+			if(inputFile == null) {
+				System.out.println("App exited.");
+				return;
+			}
+			
+			Document doc = getDocument(inputFile);
+			
+			countLinks(doc);
+
+			takeUserInputs();
+
+			addCustomStylesScriptsToHeadTag(doc);
+
+			findAndExpandUrl(doc, false);
+			
+			export(inputFile, doc);
+			
+			System.out.println("App exited.");
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		} 
+		/*
+		 * finally { if (is != null) { try { is.close(); } catch (IOException e) { //
+		 * catch block e.printStackTrace(); } } }
+		 */
+	}
+	
+	private static void countLinks(Document doc) {
+		System.out.println("Scanning for links..");
+		findAndExpandUrl(doc, true);
+		System.out.println("Total number of links found - " + TOTAL_LINK_COUNT);
+	}
+
+	private static void takeUserInputs() {
 		Scanner scanner = new Scanner(System.in); // Create a Scanner object
 		// System.out.println("Enter HTML filename with fullpath to convert:");
 		// String filename = scanner.nextLine(); // Read user input
 
-		System.out.print("Is this Supplier html? (Y/N): ");
-		String iSupplierStr = scanner.nextLine(); // Read user input
-		if (iSupplierStr.equalsIgnoreCase("Y")) {
-			IS_SUPPLIER_FLAG = true;
+		System.out.print("Select report format - Thumbnail or Image hover(default)? (T/Hit Enter): ");
+		String reportFormatSelectionStr = scanner.nextLine(); // Read user input
+		if (reportFormatSelectionStr.equalsIgnoreCase("T")) {
+			IS_THUMBNAIL_FORMAT_REQ_FLAG = true;
 		}
 
-		System.out.print("How many links to expand? (Enter any number/ALL): ");
+		System.out.print("How many links to expand? (Enter any number/Hit Enter for all): ");
 		String linkLimitStr = scanner.nextLine(); // Read user input
-		if (!linkLimitStr.equalsIgnoreCase("ALL")) {
+		if (!linkLimitStr.equalsIgnoreCase("")) {
 			try {
 				LINK_TO_EXPAND_LIMIT = Integer.parseInt(linkLimitStr);
 			} catch (NumberFormatException nfe) {
 				System.err.println("Error - Please retry with a valid number");
 			}
+		} else {
+			LINK_TO_EXPAND_LIMIT = TOTAL_LINK_COUNT;
 		}
 
-//		System.out.print("Export as HTML or PDF or both? (H/P/B): ");
-//		String isPdfStr = scanner.nextLine(); // Read user input
-//		if (isPdfStr.equalsIgnoreCase("P") || isPdfStr.equalsIgnoreCase("B")) {
-//			IS_PDF_OUTPUT_REQUIRED = true;
-//		}
+		//		System.out.print("Export as HTML or PDF or both? (H/P/B): ");
+		//		String isPdfStr = scanner.nextLine(); // Read user input
+		//		if (isPdfStr.equalsIgnoreCase("P") || isPdfStr.equalsIgnoreCase("B")) {
+		//			IS_PDF_OUTPUT_REQUIRED = true;
+		//		}
 
 		scanner.close();
-
-		try {
-			File inputFile = correctHTMLSyntaxErrors();
-			INPUT_FILENAME = inputFile.getName();
-
-			Document doc = getDocument(inputFile);
-
-			addCustomStylesScriptsToHeadTag(doc, INPUT_FILENAME);
-
-			findAndExpandUrl(doc);
-
-			// if(IS_PDF_OUTPUT_REQUIRED) {
-			File outputFile = new File(
-					OUTPUT_FILE_DIR + INPUT_FILENAME.replace(DOT_HTML_FILE_SUFFIX, "").replace(TEMP_FILE_SUFFIX, "")
-							+ " - " + getCurrentDateTime() + DOT_PDF_FILE_SUFFIX);
-			transformHtmlToPdf(inputFile, outputFile);
-			outputFile = new File(
-					OUTPUT_FILE_DIR + INPUT_FILENAME.replace(DOT_HTML_FILE_SUFFIX, "").replace(TEMP_FILE_SUFFIX, "")
-							+ " - " + getCurrentDateTime() + DOT_HTML_FILE_SUFFIX);
-			transformHtmlToHTML(doc, outputFile);
-			// }
-
-			System.out.println("Total number of links found - " + TOTAL_LINK_COUNT);
-			System.out.println("Total number of expanded links - " + EXPANDED_LINK_COUNTER);
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
 	}
+
+	private static void export(File inputFile, Document doc) throws IOException, DocumentException, TransformerException {
+		// if(IS_PDF_OUTPUT_REQUIRED) {
+		File outputFile = new File(
+				OUTPUT_FILE_DIR + INPUT_FILENAME.replace(DOT_HTML_FILE_SUFFIX, "")
+						+ " - " + getCurrentDateTime() + DOT_PDF_FILE_SUFFIX);
+		transformHtmlToPdf(inputFile, outputFile);
+		
+		outputFile = new File(
+				OUTPUT_FILE_DIR + INPUT_FILENAME.replace(DOT_HTML_FILE_SUFFIX, "")
+						+ " - " + getCurrentDateTime() + DOT_HTML_FILE_SUFFIX);
+		transformHtmlToHTML(doc, outputFile);
+		// }
+	}	
 
 	private static Document getDocument(File inputFile) throws ParserConfigurationException, SAXException, IOException {
 		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
@@ -148,7 +181,7 @@ public class PowerHTMLConverter {
 		return dtf.format(now);
 	}
 
-	private static void findAndExpandUrl(Document doc) {
+	private static void findAndExpandUrl(Document doc, boolean countLinksFlag) {
 		// Find the http links to modify
 		NodeList trs = doc.getElementsByTagName(ROW_TAG);
 		for (int i = 0; i < trs.getLength(); i++) {
@@ -165,16 +198,16 @@ public class PowerHTMLConverter {
 							String urlText = nobrNode.getTextContent();
 							// check for url
 							if (urlText.toLowerCase().startsWith(URL_IDENTIFIER)) {
-								TOTAL_LINK_COUNT++;
+								if(countLinksFlag) {
+									TOTAL_LINK_COUNT++;
+									continue;
+								}
 								// System.out.println("Found link number - " + TOTAL_LINK_COUNT);
 
 								// once expansion limit reached stop updating tds just count http links
 								if (EXPANDED_LINK_COUNTER == LINK_TO_EXPAND_LIMIT) {
-									if (j != tds.getLength()) {
-										continue;
-									} else {
-										return;
-									}
+									System.out.println("Total number of expanded links - " + EXPANDED_LINK_COUNTER + "/" + TOTAL_LINK_COUNT);
+									return;
 								}
 
 								// Writing the expanded URL in the second column
@@ -189,9 +222,12 @@ public class PowerHTMLConverter {
 									String lh3Url = getLh3Link(expandedUrl);
 									System.out.println("lh3Url - " + lh3Url);
 
-									if (IS_SUPPLIER_FLAG) {
+									if (IS_THUMBNAIL_FORMAT_REQ_FLAG) {
 										// set id
 										((Element) td).setAttribute("id", "tinyurl_img");
+										
+										// remove text
+										nobrNode.setTextContent("");
 
 										// create image tag
 										Element anchorEle = doc.createElement(IMAGE_TAG);
@@ -207,8 +243,14 @@ public class PowerHTMLConverter {
 
 										// create anchor tag
 										Element anchorEle = doc.createElement(ANCHOR_TAG);
-										anchorEle.setAttribute("href", lh3Url);
-										((Node) anchorEle).setTextContent("Image Hover");
+										if(lh3Url == null) {
+											((Node) anchorEle).setTextContent(urlText);
+										} else {
+											anchorEle.setAttribute("href", lh3Url);	
+											((Node) anchorEle).setTextContent("Image Hover");
+										}
+										
+										
 
 										nobrNode.appendChild(anchorEle);
 									}
@@ -219,10 +261,9 @@ public class PowerHTMLConverter {
 				}
 			}
 		}
-
 	}
 
-	private static void addCustomStylesScriptsToHeadTag(Document doc, String filename) {
+	private static void addCustomStylesScriptsToHeadTag(Document doc) {
 		// Find the body element to modify
 		NodeList headNodes = doc.getElementsByTagName(HEAD_TAG);
 		if (headNodes.getLength() == 1) {
@@ -249,11 +290,11 @@ public class PowerHTMLConverter {
 						return;
 					}
 
-					String htmlTitle = filename.replace(TEMP_FILE_SUFFIX, "") + " - Output";
-					if (IS_SUPPLIER_FLAG) {
-						title.setTextContent(htmlTitle + " For Supplier");
+					String htmlTitle = INPUT_FILENAME + " - Output";
+					if (IS_THUMBNAIL_FORMAT_REQ_FLAG) {
+						title.setTextContent(htmlTitle + ": Thumbnail format");
 					} else {
-						title.setTextContent(htmlTitle + " For Internal Use");
+						title.setTextContent(htmlTitle + ": Hover format");
 					}
 
 					// create script tag
@@ -359,7 +400,8 @@ public class PowerHTMLConverter {
 		File inputFileDir = new File(INPUT_FILE_DIR);
 		System.out.println("Scanning input folder for html files..." + inputFileDir.getAbsolutePath());
 		if (inputFileDir == null || inputFileDir.list() == null) {
-			System.err.println("No input folder found. Please create one and retry.");
+			System.err.println("Error - No input folder found. Please create one and retry.");
+			return null;
 		}
 
 		for (String file : inputFileDir.list()) {
@@ -369,6 +411,11 @@ public class PowerHTMLConverter {
 				System.out.println("Converting html file - " + inputFile.getAbsolutePath());
 				break;
 			}
+		}
+		
+		if(inputFile == null) {
+			System.err.println("Error - No report file found in the input folder. Please add one and retry.");
+			return null;
 		}
 
 		// to fix error - Open quote is expected for attribute "leftMargin" associated
@@ -393,14 +440,16 @@ public class PowerHTMLConverter {
 		}
 
 		// Once everything is complete, delete old file..
-		// inputFile.delete();
+		inputFile.delete();
 
 		// And rename tmp file's name to old file name
 		tempFile.renameTo(inputFile);
 
-		System.out.println("Corrected file syntax in file - " + tempFile.getAbsolutePath());
+		INPUT_FILENAME = inputFile.getName();
+		
+		System.out.println("Corrected file syntax in file - " + inputFile.getAbsolutePath());
 
-		return tempFile;
+		return inputFile;
 	}
 
 	public static void transformHtmlToPdf(File inputFile, File outputFile) throws IOException, DocumentException {

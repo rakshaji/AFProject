@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.anchal</groupId>
     <artifactId>TEST-PHC</artifactId>
-    <version>1.0</version>
+    <version>1.1</version>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
@@ -113,6 +113,7 @@
     </build>
 
     <dependencies>
+    	<!-- required for assembly zip feature-->
 	    <dependency>
 		    <groupId>org.apache.commons</groupId>
 		    <artifactId>commons-lang3</artifactId>
@@ -146,12 +147,12 @@
             <version>0.4.14</version>
         </dependency>
 
-        <dependency>  
-            <groupId>log4j</groupId>  
-            <artifactId>log4j</artifactId>  
-            <version>1.2.17</version>  
-        </dependency>  
-        
+        <!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-core -->
+		<dependency>
+		    <groupId>org.apache.logging.log4j</groupId>
+		    <artifactId>log4j-core</artifactId>
+		    <version>2.24.1</version>
+		</dependency>
         <dependency>
 		    <groupId>org.xhtmlrenderer</groupId>
 		    <artifactId>flying-saucer-core</artifactId>
