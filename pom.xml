@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.anchal</groupId>
     <artifactId>TEST-PHC</artifactId>
-    <version>1.1</version>
+    <version>1.2</version>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
@@ -51,6 +51,7 @@
 	                        <goal>single</goal>
 	                    </goals>
                     </execution>
+                    <!--
                     <execution>
                         <phase>package</phase>
                         <goals>
@@ -63,6 +64,7 @@
                             </descriptors>
                         </configuration>
                     </execution>
+                    -->
                 </executions>
             </plugin>
             
@@ -85,20 +87,6 @@
                     </execution>
                 </executions>
             </plugin>
-
-            <!-- <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-                <version>3.5.2</version>
-                <executions>
-                <execution>
-                    <phase>package</phase>
-                    <goals>
-                    <goal>shade</goal>
-                    </goals>
-                </execution>
-                </executions>
-            </plugin> -->
 
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
@@ -163,6 +151,12 @@
 		    <groupId>org.xhtmlrenderer</groupId>
 		    <artifactId>flying-saucer-pdf</artifactId>
 		    <version>9.1.22</version>
+		</dependency>
+		
+		<dependency>
+		    <groupId>com.microsoft.sqlserver</groupId>
+		    <artifactId>mssql-jdbc</artifactId>
+		    <version>12.8.1.jre8</version>
 		</dependency>
 
     </dependencies>

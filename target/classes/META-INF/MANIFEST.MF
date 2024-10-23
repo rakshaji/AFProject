@@ -13,7 +13,8 @@ Class-Path: dependency-jars/commons-lang3-3.0.jar dependency-jars/poi-oo
  saucer-core-9.1.22.jar dependency-jars/flying-saucer-pdf-9.1.22.jar dep
  endency-jars/itext-2.1.7.jar dependency-jars/bcmail-jdk14-1.64.jar depe
  ndency-jars/bcpkix-jdk14-1.64.jar dependency-jars/bctsp-jdk14-1.46.jar 
- dependency-jars/bcprov-jdk14-1.64.jar
+ dependency-jars/bcprov-jdk14-1.64.jar dependency-jars/mssql-jdbc-12.8.1
+ .jre8.jar
 Main-Class: com.anchal.PowerHTMLConverter
 Created-By: Maven Integration for Eclipse
 
