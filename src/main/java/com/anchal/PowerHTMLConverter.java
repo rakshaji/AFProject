@@ -57,28 +57,27 @@ public class PowerHTMLConverter {
 	private static String INPUT_FILENAME = null;
 
 	// test paths
-	private static final String INPUT_FILE_DIR = ".\\input\\";
-	private static final String OUTPUT_FILE_DIR = ".\\output\\";
-	private static final String INPUT_OLD_DIR = ".\\input\\old\\";
-	private static final String AF_CSS = "../css/aanchalFashionCustomStyles.css";
-	private static final String AF_MINIPREVIEW_JS = "../js/jquery.minipreview.js";
-	private static final String AF_JS = "../js/aanchalFashionCustomScript.js";
-	private static final String AF_MINIPREVIEW_CSS = "../css/jquery.minipreview.css";
-	private static final String AF_POST_JS = "../js/aanchalFashionCustomPostScript.js";
+	/*
+	 * private static final String INPUT_FILE_DIR = ".\\input\\"; private static
+	 * final String OUTPUT_FILE_DIR = ".\\output\\"; private static final String
+	 * INPUT_OLD_DIR = ".\\input\\old\\"; private static final String AF_CSS =
+	 * "../css/aanchalFashionCustomStyles.css"; private static final String
+	 * AF_MINIPREVIEW_JS = "../js/jquery.minipreview.js"; private static final
+	 * String AF_JS = "../js/aanchalFashionCustomScript.js"; private static final
+	 * String AF_MINIPREVIEW_CSS = "../css/jquery.minipreview.css"; private static
+	 * final String AF_POST_JS = "../js/aanchalFashionCustomPostScript.js";
+	 */
 
 	// prod paths
-	// private static final String INPUT_FILE_DIR = "..\\input\\";
-	// private static final String OUTPUT_FILE_DIR = "..\\output\\";
-	// private static String JAR_DIR = "./../PowerHtmlConverter/";
-	// private static String AF_CSS = JAR_DIR +
-	// "css/aanchalFashionCustomStyles.css";
-	// private static String AF_MINIPREVIEW_JS = JAR_DIR +
-	// "js/jquery.minipreview.js";
-	// private static String AF_JS = JAR_DIR + "js/aanchalFashionCustomScript.js";
-	// private static final String AF_MINIPREVIEW_CSS = JAR_DIR +
-	// "css/jquery.minipreview.css";
-	// private static final String AF_POST_JS = JAR_DIR +
-	// "js/aanchalFashionCustomPostScript.js";
+	private static final String INPUT_OLD_DIR = "..\\input\\old\\";
+	private static final String INPUT_FILE_DIR = "..\\input\\";
+	private static final String OUTPUT_FILE_DIR = "..\\output\\";
+	private static String JAR_DIR = "./../PowerHtmlConverter/";
+	private static String AF_CSS = JAR_DIR + "css/aanchalFashionCustomStyles.css";
+	private static String AF_MINIPREVIEW_JS = JAR_DIR + "js/jquery.minipreview.js";
+	private static String AF_JS = JAR_DIR + "js/aanchalFashionCustomScript.js";
+	private static final String AF_MINIPREVIEW_CSS = JAR_DIR + "css/jquery.minipreview.css";
+	private static final String AF_POST_JS = JAR_DIR + "js/aanchalFashionCustomPostScript.js";
 
 	private static final String TEMP_FILE_SUFFIX = "tmp_";
 	private static final String HTML_FILE_SUFFIX = "html";
@@ -396,10 +395,12 @@ public class PowerHTMLConverter {
 						// retry connection one more time
 						lh3Url = expandUrlAndFetchLh3Link(urlText);
 					}
-					if(IS_THUMBNAIL_FORMAT_REQ_FLAG) {
+					if (IS_THUMBNAIL_FORMAT_REQ_FLAG) {
 						entry.setValue(lh3Url == null ? "" : lh3Url);// for thumbnail use 250 smaller size image
 					} else {
-						entry.setValue(lh3Url == null ? "" : lh3Url.replace("s250", "s450"));// for image hover - increase image size from 250 to 450
+						entry.setValue(lh3Url == null ? "" : lh3Url.replace("s250", "s450"));// for image hover -
+																								// increase image size
+																								// from 250 to 450
 					}
 				};
 			};
@@ -417,7 +418,7 @@ public class PowerHTMLConverter {
 		long duration = endDate.getTime() - startDate.getTime();
 		long diffInSeconds = TimeUnit.MILLISECONDS.toSeconds(duration);
 		System.out.println("Total time taken - " + diffInSeconds + " seconds");
-		System.out.println("Average time taken per link- " + diffInSeconds/LINKS_TO_EXPAND_MAP.size() + " seconds");
+		System.out.println("Average time taken per link- " + diffInSeconds / LINKS_TO_EXPAND_MAP.size() + " seconds");
 
 		return service;
 	}
