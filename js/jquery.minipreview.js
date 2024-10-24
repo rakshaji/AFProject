@@ -54,8 +54,8 @@
             
             // sizing
             $wrapper.css({
-                width: this.options.width + 'px',
-                height: this.options.height + 'px'
+                width: this.options.width + 120 + 'px', // to move the frame side ways
+                height: this.options.height + 120 + 'px'// -"-
             });
             
             // scaling
@@ -68,8 +68,9 @@
 
             // positioning
             var fontSize = parseInt(this.$el.css('font-size').replace('px', ''), 10)
-            var top = (this.$el.height() + fontSize) / 2;
-            var left = (this.$el.width() - $wrapper.outerWidth()) / 2;
+            var top = (this.$el.height() + fontSize) / 2;//-($wrapper.outerHeight() + fontSize) / 2; 
+            var left = ((this.$el.width() - $wrapper.outerWidth() ) / 2) + 170;// AN-28
+            
             $wrapper.css({
                 top: top + 'px',
                 left: left + 'px'

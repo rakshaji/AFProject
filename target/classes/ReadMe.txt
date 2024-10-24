@@ -1,12 +1,10 @@
-# Release notes 1.2:
+# Release notes 1.1:
 ===================
 - Count links first then get user input
 - Add bookmarks dropdown
 - Improve performance of link expansion
-- PDF landscape orientation
-- Pick the latest file as input
+- Pick the latest file as input, move other to old dir
 - Scroll to top button
-
 
 # Prerequisite:
 ===============

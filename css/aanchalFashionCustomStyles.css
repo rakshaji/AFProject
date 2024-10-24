@@ -32,7 +32,7 @@
   font-size: 18px;
   border: green;
   outline: none;
-  background-color: #333;
+  background-color: green;
   color: white;
   cursor: pointer;
   padding: 15px;
@@ -40,6 +40,6 @@
 }
 
 #topBtn:hover {
-  background-color: green;
+  background-color: #333;
 }
 /* required tomake topnav bar and dropdown sticky ends */

@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.anchal</groupId>
     <artifactId>TEST-PHC</artifactId>
-    <version>1.2</version>
+    <version>1.1</version>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
@@ -51,7 +51,6 @@
 	                        <goal>single</goal>
 	                    </goals>
                     </execution>
-                    <!--
                     <execution>
                         <phase>package</phase>
                         <goals>
@@ -64,7 +63,6 @@
                             </descriptors>
                         </configuration>
                     </execution>
-                    -->
                 </executions>
             </plugin>
             

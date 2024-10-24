@@ -16,7 +16,13 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -38,6 +44,7 @@ import org.w3c.dom.NodeList;
 import org.xhtmlrenderer.pdf.ITextRenderer;
 import org.xml.sax.SAXException;
 
+import com.graphbuilder.struc.LinkedList;
 import com.lowagie.text.DocumentException;
 
 public class PowerHTMLConverter {
@@ -48,7 +55,7 @@ public class PowerHTMLConverter {
 	private static int LINK_TO_EXPAND_LIMIT = 0;
 	private static int TOTAL_LINK_COUNT = 0;
 	private static String INPUT_FILENAME = null;
-	
+
 	// test paths
 	private static final String INPUT_FILE_DIR = ".\\input\\";
 	private static final String OUTPUT_FILE_DIR = ".\\output\\";
@@ -58,16 +65,20 @@ public class PowerHTMLConverter {
 	private static final String AF_JS = "../js/aanchalFashionCustomScript.js";
 	private static final String AF_MINIPREVIEW_CSS = "../css/jquery.minipreview.css";
 	private static final String AF_POST_JS = "../js/aanchalFashionCustomPostScript.js";
-	
+
 	// prod paths
 	// private static final String INPUT_FILE_DIR = "..\\input\\";
 	// private static final String OUTPUT_FILE_DIR = "..\\output\\";
 	// private static String JAR_DIR = "./../PowerHtmlConverter/";
-	// private static String AF_CSS = JAR_DIR + "css/aanchalFashionCustomStyles.css";
-	// private static String AF_MINIPREVIEW_JS = JAR_DIR + "js/jquery.minipreview.js";
+	// private static String AF_CSS = JAR_DIR +
+	// "css/aanchalFashionCustomStyles.css";
+	// private static String AF_MINIPREVIEW_JS = JAR_DIR +
+	// "js/jquery.minipreview.js";
 	// private static String AF_JS = JAR_DIR + "js/aanchalFashionCustomScript.js";
-	// private static final String AF_MINIPREVIEW_CSS = JAR_DIR + "css/jquery.minipreview.css";
-	// private static final String AF_POST_JS = JAR_DIR + "js/aanchalFashionCustomPostScript.js";
+	// private static final String AF_MINIPREVIEW_CSS = JAR_DIR +
+	// "css/jquery.minipreview.css";
+	// private static final String AF_POST_JS = JAR_DIR +
+	// "js/aanchalFashionCustomPostScript.js";
 
 	private static final String TEMP_FILE_SUFFIX = "tmp_";
 	private static final String HTML_FILE_SUFFIX = "html";
@@ -87,7 +98,10 @@ public class PowerHTMLConverter {
 	private static final String BOOKMARK_TAG = "bookmarkSelect";
 	private static final String BODY_TAG = "body";
 	private static final String SELECT_TAG = "select";
-	
+
+	private static final List<String> HTTP_TO_LH3_LIST = new java.util.LinkedList<>();
+	private static final ConcurrentHashMap<String, String> LINKS_TO_EXPAND_MAP = new ConcurrentHashMap<>();
+
 	public static void main(String[] args) {
 		// InputStream is =
 		// PowerHTMLConverter.class.getResourceAsStream("/config.properties" );
@@ -96,7 +110,8 @@ public class PowerHTMLConverter {
 		try {
 			// properties.load(is);
 			// JAR_DIR = properties.getProperty("jar_path", JAR_DIR);
-			
+
+			// for some reports to avoid JAX error for more than 64000 entities parse issue
 			System.setProperty("jdk.xml.entityExpansionLimit", "0");
 
 			File inputFile = correctHTMLSyntaxErrors();
@@ -111,11 +126,13 @@ public class PowerHTMLConverter {
 
 			takeUserInputs();
 
+			expandUrlsUsingThreads();
+
 			addCustomStylesScriptsToHeadTag(doc);
 
 			addBookmarks(doc);
 
-			findAndExpandUrl(doc, false);
+			transformUrls(doc, false);
 
 			export(inputFile, doc);
 
@@ -167,8 +184,8 @@ public class PowerHTMLConverter {
 				// add topnav div and topbtn as the first child
 				bodyEle.appendChild(topNavDiv);
 				bodyEle.appendChild(topBtn);
-				
-				//add back the child nodes
+
+				// add back the child nodes
 				for (int i = 0; i < bodyChildNodes.getLength(); i++) {
 					bodyEle.appendChild(bodyChildNodes.item(i));
 				}
@@ -179,7 +196,7 @@ public class PowerHTMLConverter {
 
 	private static void countLinks(Document doc) {
 		System.out.println("Scanning for links..");
-		findAndExpandUrl(doc, true);
+		transformUrls(doc, true);
 		System.out.println("Total number of links found - " + TOTAL_LINK_COUNT);
 	}
 
@@ -253,15 +270,17 @@ public class PowerHTMLConverter {
 		LocalDateTime now = LocalDateTime.now();
 		return dtf.format(now);
 	}
-	
-	public static String convertTime(long time){
-	    Date date = new Date(time);
-	    Format format = new SimpleDateFormat(DATE_TIME_FORMAT);
-	    return format.format(date);
-	}
-	
 
-	private static void findAndExpandUrl(Document doc, boolean countLinksFlag) {
+	public static String convertTime(long time) {
+		Date date = new Date(time);
+		Format format = new SimpleDateFormat(DATE_TIME_FORMAT);
+		return format.format(date);
+	}
+
+	private static void transformUrls(Document doc, boolean countLinksFlag) {
+		if (!countLinksFlag) {
+			System.out.println("Rendering urls..may take some time");
+		}
 		// Find the http links to modify
 		NodeList trs = doc.getElementsByTagName(ROW_TAG);
 		for (int i = 0; i < trs.getLength(); i++) {
@@ -278,61 +297,58 @@ public class PowerHTMLConverter {
 							String urlText = nobrNode.getTextContent();
 							// check for url
 							if (urlText.toLowerCase().startsWith(URL_IDENTIFIER)) {
+
 								if (countLinksFlag) {
-									TOTAL_LINK_COUNT++;
+									try {
+										HTTP_TO_LH3_LIST.add(urlText);
+										TOTAL_LINK_COUNT++;
+									} catch (Exception e) {
+										e.printStackTrace();
+									}
 									continue;
 								}
-								// System.out.println("Found link number - " + TOTAL_LINK_COUNT);
 
-								// once expansion limit reached stop updating tds just count http links
-								if (EXPANDED_LINK_COUNTER == LINK_TO_EXPAND_LIMIT) {
-									System.out.println("Total number of expanded links - " + EXPANDED_LINK_COUNTER + "/"
-											+ TOTAL_LINK_COUNT);
-									return;
-								}
+								String lh3Url = LINKS_TO_EXPAND_MAP.get(urlText);
+								if (IS_THUMBNAIL_FORMAT_REQ_FLAG) {
+									// set id
+									((Element) td).setAttribute("id", "tinyurl_img");
 
-								// Writing the expanded URL in the second column
-								String expandedUrl = expandURL(urlText);
-								if (expandedUrl == null) {
-									break;
-								} else {
-									EXPANDED_LINK_COUNTER++;
-									System.out.println("expandedUrl - " + expandedUrl);
+									// remove text
+									nobrNode.setTextContent("");
 
-									// Writing the expanded URL in the third column
-									String lh3Url = getLh3Link(expandedUrl);
-									System.out.println("lh3Url - " + lh3Url);
-
-									if (IS_THUMBNAIL_FORMAT_REQ_FLAG) {
-										// set id
-										((Element) td).setAttribute("id", "tinyurl_img");
-
-										// remove text
-										nobrNode.setTextContent("");
-
-										// create image tag
-										Element anchorEle = doc.createElement(IMAGE_TAG);
-										anchorEle.setAttribute("src", lh3Url);
-
-										nobrNode.appendChild(anchorEle);
-									} else {
-										// set id
-										((Element) td).setAttribute("id", "tinyurl");
-
-										// remove text
-										nobrNode.setTextContent("");
-
+									if (lh3Url == null || "".equals(lh3Url)) {
 										// create anchor tag
 										Element anchorEle = doc.createElement(ANCHOR_TAG);
-										if (lh3Url == null) {
-											((Node) anchorEle).setTextContent(urlText);
-										} else {
-											anchorEle.setAttribute("href", lh3Url);
-											((Node) anchorEle).setTextContent("Image Hover");
-										}
-
+										anchorEle.setAttribute("href", urlText);
+										anchorEle.setTextContent(urlText);
 										nobrNode.appendChild(anchorEle);
+									} else {
+										EXPANDED_LINK_COUNTER++;
+										// create image tag
+										Element imgEle = doc.createElement(IMAGE_TAG);
+										// imgEle.setTextContent(urlText);
+										imgEle.setAttribute("src", urlText);
+										nobrNode.appendChild(imgEle);
 									}
+								} else {
+									// set id
+									((Element) td).setAttribute("id", "tinyurl");
+
+									// remove text
+									nobrNode.setTextContent("");
+
+									// create anchor tag
+									Element anchorEle = doc.createElement(ANCHOR_TAG);
+									if (lh3Url == null || "".equals(lh3Url)) {
+										anchorEle.setTextContent(urlText);
+										anchorEle.setAttribute("href", urlText);
+									} else {
+										EXPANDED_LINK_COUNTER++;
+										anchorEle.setAttribute("href", lh3Url);
+										anchorEle.setTextContent("Image Hover");
+									}
+
+									nobrNode.appendChild(anchorEle);
 								}
 							}
 						}
@@ -340,6 +356,97 @@ public class PowerHTMLConverter {
 				}
 			}
 		}
+		if (!countLinksFlag) {
+			// once expansion limit reached stop updating tds just count http links
+			System.out.println("Total number of expanded links - " + EXPANDED_LINK_COUNTER + "/" + LINK_TO_EXPAND_LIMIT
+					+ "/" + TOTAL_LINK_COUNT);
+		}
+	}
+
+	private static ExecutorService expandUrlsUsingThreads() {
+
+		Date startDate = new Date();// Set start date
+
+		int threadCnt = 0;
+
+		int coreCnt = Runtime.getRuntime().availableProcessors();
+		ExecutorService service = Executors.newFixedThreadPool(coreCnt);
+
+		// add first n links in order to the expansion map
+		for (String key : HTTP_TO_LH3_LIST) {
+			if (threadCnt < LINK_TO_EXPAND_LIMIT) {
+				LINKS_TO_EXPAND_MAP.put(key, "");
+				threadCnt++;
+			} else {
+				break;
+			}
+		}
+
+		// expand only selected first n links
+		for (Map.Entry<String, String> entry : LINKS_TO_EXPAND_MAP.entrySet()) {
+			String urlText = entry.getKey();
+
+			Runnable expansionTask = new Runnable() {
+				@Override
+				public void run() {
+					// System.out.println("Thread started");
+					String lh3Url = expandUrlAndFetchLh3Link(urlText);
+					if (lh3Url == null) {
+						System.out.println("retrying..");
+						// retry connection one more time
+						lh3Url = expandUrlAndFetchLh3Link(urlText);
+					}
+					if(IS_THUMBNAIL_FORMAT_REQ_FLAG) {
+						entry.setValue(lh3Url == null ? "" : lh3Url);// for thumbnail use 250 smaller size image
+					} else {
+						entry.setValue(lh3Url == null ? "" : lh3Url.replace("s250", "s450"));// for image hover - increase image size from 250 to 450
+					}
+				};
+			};
+			service.execute(expansionTask);
+		}
+
+		System.out.println("###### All tasks are submitted. ###### ");
+
+		shutdownAndAwaitTermination(service);
+
+		System.out.println("###### All tasks are completed. ###### ");
+
+		// calculate time taken to expand links
+		Date endDate = new Date();// Set end date
+		long duration = endDate.getTime() - startDate.getTime();
+		long diffInSeconds = TimeUnit.MILLISECONDS.toSeconds(duration);
+		System.out.println("Total time taken - " + diffInSeconds + " seconds");
+		System.out.println("Average time taken per link- " + diffInSeconds/LINKS_TO_EXPAND_MAP.size() + " seconds");
+
+		return service;
+	}
+
+	private static void shutdownAndAwaitTermination(ExecutorService executorService) {
+		executorService.shutdown();
+		try {
+			if (!executorService.awaitTermination(90, TimeUnit.MINUTES)) {
+				executorService.shutdownNow();
+			}
+		} catch (InterruptedException ie) {
+			executorService.shutdownNow();
+			Thread.currentThread().interrupt();
+		}
+	}
+
+	private static String expandUrlAndFetchLh3Link(String urlText) {
+		String finalUrl = "";
+
+		String expandedUrl = expandURL(urlText);
+		if (expandedUrl != null) {
+			// System.out.println("expandedUrl - " + expandedUrl);
+
+			// Writing the expanded URL in the third column
+			String lh3Url = getLh3Link(expandedUrl);
+			System.out.println("lh3Url - " + lh3Url);
+			return lh3Url;
+		}
+		return finalUrl;
 	}
 
 	private static void addCustomStylesScriptsToHeadTag(Document doc) {
@@ -426,19 +533,19 @@ public class PowerHTMLConverter {
 					// }
 				}
 			}
-			
+
 			// create script tag
 			Element afPostScriptEle = doc.createElement(SCRIPT_TAG);
 			afPostScriptEle.setAttribute("src", AF_POST_JS);
 			head.getParentNode().appendChild(afPostScriptEle);
 		}
-		
+
 		System.out.println("Adding custom styles scripts...");
 	}
 
 	private static String expandURL(String tinyUrl) {
 		try {
-			Connection connection = Jsoup.connect(tinyUrl).followRedirects(true);
+			Connection connection = Jsoup.connect(tinyUrl).timeout(20 * 1000).followRedirects(true);
 			Connection.Response response = connection.execute();
 			return response.url().toString();
 		} catch (IOException e) {
@@ -547,20 +654,18 @@ public class PowerHTMLConverter {
 						System.out.println("Converting latest report file - " + chosenFile.getAbsolutePath());
 					} else {
 						// move other files to old folder
-						File oldDir = new File(INPUT_OLD_DIR );
+						File oldDir = new File(INPUT_OLD_DIR);
 						if (!oldDir.exists()) {
 							oldDir.mkdirs();
 							System.out.println("old folder created.." + oldDir.getAbsolutePath());
 						}
 
-						String newfileNameWithTimeStamp = 
-								oldDir.getCanonicalPath() 
-								+ File.separator 
+						String newfileNameWithTimeStamp = oldDir.getCanonicalPath() + File.separator
 								+ file.getName().replace(".", "_" + convertTime(file.lastModified()) + ".");
-						Files.move(Paths.get(file.getCanonicalPath())
-								, Paths.get(newfileNameWithTimeStamp)
-								, StandardCopyOption.REPLACE_EXISTING);
-						System.out.println("old files renamed with timestamp & to avoid override .." + file.getAbsolutePath());
+						Files.move(Paths.get(file.getCanonicalPath()), Paths.get(newfileNameWithTimeStamp),
+								StandardCopyOption.REPLACE_EXISTING);
+						System.out.println(
+								"old files renamed with timestamp & to avoid override .." + file.getAbsolutePath());
 					}
 				} catch (IOException e) {
 					e.printStackTrace();
